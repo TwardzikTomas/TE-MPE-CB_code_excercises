@@ -31,8 +31,7 @@ In addition, setup a CI pipeline (using Gitlab CI, Github Actions or equivalent)
 
 
 assumptions:
-	- format of the dependency json file is as given
-	- 
+	- valid format of the dependency json file is as given
 """
 
 # WARNING pozor na nedefinovane dependencies, mam jen ve strome ale nemam tu dependency available
@@ -51,26 +50,54 @@ dependency_tree = dict[str, dict]
 TARGET_PATH = "/tmp/deps.json"
 
 class CyclicImportError(Exception):
+    """
+    Raised if cyclic dependency is detected during verification of the dependency file file
+    """
     ...
     
 class MissingPackageError(Exception):
+    """
+    Raised if a missing package is detected during verification of the dependency file
+    """
     ...
 
 class Package:
-    def __init__(self, name: str, dependencies:list['Package']= None, depth_level: int = 0):
+    """Class that represents a package, with its dependencies and depth in the dependency graph
+    """
+    def __init__(self, name: str, depth_level: int = 0):
         self.name = name
-        self.dependencies = dependencies
+        self.dependencies: list['Package'] = []
         self.depth_level = depth_level
-
-
-class DependencyResolver:    
-    def verify_dependency_structure(self, dependency_data: dict[str, list]) -> None:
-        self.verify_presence(dependency_data)
-        self.verify_cyclic_imports(dependency_data)        
         
+    def __repr__(self):
+        class_name = type(self).__name__
+        return f"{class_name}(name={self.name!r}, dependencies={[dependency.name for dependency in self.dependencies]}, depth_level={self.depth_level!r})"
+            
+    def structural_print(self):
+        """
+        Convenience method that recursively prints dependency structure of a package
+        """
+        print(f"{self.depth_level*'  '}- {self.name}")
+        for dep in self.dependencies:
+            dep.structural_print()
 
-# TODO ? mozna prepsat a spojit do jednoho? + perforamce -extendibility, readability
-    def verify_presence(self, dependency_data: dict[str, list]) -> bool:
+class DependencyResolver:  
+      
+    def verify_dependency_structure(self, dependency_data: dict[str, list]) -> None:
+        self.verify_dependency_fields(dependency_data)     
+        self.verify_presence(dependency_data)
+        self.verify_cyclic_imports(dependency_data)   
+        
+    def verify_dependency_fields(self, dependency_data: dict[str, list]) -> None:
+        if not isinstance(dependency_data, dict):
+            raise TypeError(f"Loaded JSON file does not provide dictionary")
+        for pkg, deps in dependency_data.items():
+            if not isinstance(pkg, str):
+                raise TypeError(f"ERROR: Package name {pkg!r} is not string")
+            if not isinstance(deps, list):
+                raise TypeError(f"ERROR: Package {pkg!r} dependencies are not a list")
+
+    def verify_presence(self, dependency_data: dict[str, list]) -> None:
         pkgs = dependency_data.keys()
         for _, deps in dependency_data.items():
             for dep in deps:
@@ -78,65 +105,63 @@ class DependencyResolver:
                     raise MissingPackageError(f"ERROR: Package {dep!r} was not found in dependency list")
 
 
-    def verify_cyclic_imports(self, dependency_data: dict[str, list]):
+    def verify_cyclic_imports(self, dependency_data: dict[str, list]) -> None:
         for pkg, deps in dependency_data.items():
             for dep in deps:
                 if pkg in dependency_data[dep]:
                     raise CyclicImportError(f"ERROR: packages {pkg!r} and {dep!r} are creating cyclic dependency")
  
-    
-    @classmethod
-    def resolve_graph(cls, file_path: Union[str, Path]) -> dependency_tree:
-        def resolve_dependency(pkg: str):
-            print(f"resolve dependency {pkg=}")
-            dependencies = {}
+    def resolve_graph(self, file_path: Union[str, Path]) -> list[Package]:
+        def resolve_dependency(pkg: str, depth:int=0):
             
-            if len(dependency_data[pkg]) == 0:
-                print("returning empty as the package is independent")
-            else:
-                try:
-                    for dependency in dependency_data[pkg]:
-						# print(f"gooing deeper with recursion: from {pkg=} looking for deps of {dependency}")
-                        dependencies[f"{dependency}"] = resolve_dependency(dependency)
-                except KeyError:
-                    print(f"Dependency {dependency} is missing in the {file_path}")
-        
-            print(f"returning dependencies of {pkg}: {dependencies}")
-            return dependencies
+            package = Package(pkg, depth)
+            
+            if len(dependency_data[pkg]) != 0:
+                for dependency in dependency_data[pkg]:
+                    # print(f"gooing deeper with recursion: from {pkg=} looking for deps of {dependency}")
+                    package.dependencies.append(resolve_dependency(dependency, depth+1))
+            # print(f"returning  of {pkg}: {package}")
+            return package
 		
 		# check for existence of a file, shortcircuit for errors
         if os.path.isfile(file_path) is False:
             raise FileExistsError(f"Error. File at the path {file_path} does not exist.")
 
-        dependency_data = {}
+        
         with open(file_path) as json_file:
             dependency_data: dict = load(json_file)
    
-        print(f"{dependency_data=}")
-        
         try:
-            cls.verify_dependency_structure(dependency_data)
-        except Exception:
+            self.verify_dependency_structure(dependency_data)
+        except (MissingPackageError, CyclicImportError):
             print("Aborting program due to data structure issues")
-            quit(-1)
-            
+            raise
         else:
-            dependency_dict = {}
+            dependency_graph = []
             for pkg in dependency_data.keys():
-                dependency_dict[f"{pkg}"] = resolve_dependency(pkg)
+                dependency_graph.append(resolve_dependency(pkg))
                 
-            return dependency_dict
+            return dependency_graph
 
-  
-    @classmethod
-    def print_graph(cls, file_path: Union[str, Path]):
-        resolved_graph = cls.resolve_graph(file_path)
+    def print_dependency_graph(self, file_path: Union[str, Path]) -> None:
+        """Prints a formatted dependency graph defined by 'file_path' file
 
-        print(f"{resolved_graph}")
+        Args:
+            file_path (Union[str, Path]): JSON file containing dependency relations
+        """
+        resolved_graph = self.resolve_graph(file_path)
+
+        for node in resolved_graph:
+            node.structural_print()
 	
   
+# example uses
 if __name__ == "__main__":
 	
 	dr = DependencyResolver()
-	dr.resolve_graph(TARGET_PATH)
-	dr.print_graph(TARGET_PATH)
+    
+    # retrieve dependency structure
+	package_structure = dr.resolve_graph(TARGET_PATH)
+ 
+    # print dependency graph
+	dr.print_dependency_graph(TARGET_PATH)
