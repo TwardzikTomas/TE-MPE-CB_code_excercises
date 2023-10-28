@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "TE_MPE_CB_code_interview"
+version = "0.0.1"
+authors = [
+    {name = "Twardzik Tomas", email = "twardziktom@gmail.com"}
+]
+description = "An example solution to CERN's CB section code interview."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "click",
+    'importlib-metadata; python_version<"3.8"',
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+
+[project.scripts]
+excercise-one = "solutions.ecercise_one:detect_duplicate"
