@@ -128,7 +128,7 @@ class DependencyResolver:
 		
 		# check for existence of a file, shortcircuit for errors
         if os.path.isfile(file_path) is False:
-            raise FileExistsError(f"Error. File at the path {file_path} does not exist.")
+            raise FileNotFoundError(f"Error. File at the path {file_path} does not exist.")
 
         
         with open(file_path) as json_file:
