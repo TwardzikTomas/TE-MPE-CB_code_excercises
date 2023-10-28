@@ -32,10 +32,10 @@ In addition, setup a CI pipeline (using Gitlab CI, Github Actions or equivalent)
 
 assumptions:
 	- valid format of the dependency json file is as given
+    - any deviation from the is prohibited
+    - cyclic imports result in failure
+    - all packages in dependencies must be listed themselves in the root of the structure
 """
-
-# WARNING pozor na nedefinovane dependencies, mam jen ve strome ale nemam tu dependency available
-# pozor na cyclic dependencies
 
 # system imports
 import os
