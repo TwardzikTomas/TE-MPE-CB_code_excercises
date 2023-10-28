@@ -211,14 +211,26 @@ class DependencyResolver:
         for node in resolved_graph:
             node.structural_print()
 	
+
+# convenience method exposing variable target path
+def show_dependency_graph(target_path: str = TARGET_PATH):
+        
+    dr = DependencyResolver()
+    # print dependency graph
+    dr.print_dependency_graph(target_path)
+  
+
+# convenience method exposing variable target path
+def build_dependency_graph(target_path: str = None) -> dependency_tree:
+    
+    dr = DependencyResolver()
+    # return retrieved 'dependency_tree'
+    return dr.resolve_graph(target_path)
+
+    
   
 # example uses
 if __name__ == "__main__":
 	
-	dr = DependencyResolver()
-    
-    # retrieve dependency structure
-	package_structure = dr.resolve_graph(TARGET_PATH)
+	show_dependency_graph()
  
-    # print dependency graph
-	dr.print_dependency_graph(TARGET_PATH)
