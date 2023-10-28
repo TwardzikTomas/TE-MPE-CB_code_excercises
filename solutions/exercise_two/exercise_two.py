@@ -43,8 +43,6 @@ from json import load
 from typing import Union
 from pathlib import Path
 
-# custom type hints definition
-dependency_tree = dict[str, dict]
 
 # global variables
 TARGET_PATH = "/tmp/deps.json"
@@ -87,11 +85,29 @@ dependency_tree = list[Package]
 
 class DependencyResolver:  
     def verify_dependency_structure(self, dependency_data: dict[str, list]) -> None:
+        """Method verifies if the content of JSON file is valid for further processing.
+
+        NOTE: Verification process could be done more computationally efficient, but this approach
+        is easier to extend, clearly communicates it's components functionality and is more readable
+        
+        Args:
+            dependency_data (dict[str, list]): Data containing dependency relations read from a JSON file.
+        """
         self.verify_dependency_fields(dependency_data)     
         self.verify_presence(dependency_data)
         self.verify_cyclic_imports(dependency_data)   
         
     def verify_dependency_fields(self, dependency_data: dict[str, list]) -> None:
+        """Function verifying if the data structure provided by JSON file is valid.
+
+        Args:
+            dependency_data (dict[str, list]): Data containing dependency relations read from a JSON file.
+
+        Raises:
+            TypeError: raises if argument 'dependency_data' is not dict,
+            TypeError: raises if keys of the dict are not strings
+            TypeError: raises if values of the dict are not lists
+        """
         if not isinstance(dependency_data, dict):
             raise TypeError(f"Loaded JSON file does not provide dictionary")
         for pkg, deps in dependency_data.items():
@@ -101,6 +117,14 @@ class DependencyResolver:
                 raise TypeError(f"ERROR: Package {pkg!r} dependencies are not a list")
 
     def verify_presence(self, dependency_data: dict[str, list]) -> None:
+        """Function verifying if all dependencies are listed as a package.
+
+        Args:
+            dependency_data (dict[str, list]): Data containing dependency relations read from a JSON file.
+
+        Raises:
+            MissingPackageError: raise if a package is listed in dependencies, while not being listed on its own.
+        """
         pkgs = dependency_data.keys()
         for _, deps in dependency_data.items():
             for dep in deps:
@@ -109,21 +133,46 @@ class DependencyResolver:
 
 
     def verify_cyclic_imports(self, dependency_data: dict[str, list]) -> None:
+        """Function verifying if there is no cyclic redundancy present.
+
+        Args:
+            dependency_data (dict[str, list]): Data containing dependency relations read from a JSON file.
+
+        Raises:
+            CyclicImportError: raise if a package has a dependency, for which it is a dependency itself
+        """
         for pkg, deps in dependency_data.items():
             for dep in deps:
                 if pkg in dependency_data[dep]:
                     raise CyclicImportError(f"ERROR: packages {pkg!r} and {dep!r} are creating cyclic dependency")
  
-    def resolve_graph(self, file_path: Union[str, Path]) -> list[Package]:
-        def resolve_dependency(pkg: str, depth:int=0):
-            
-            package = Package(pkg, depth)
+    def resolve_graph(self, file_path: Union[str, Path]) -> dependency_tree:
+        """A method retrieving 'dependency_tree' structure from a file defined by 'file_path' argument.
+
+        Args:
+            file_path (Union[str, Path]): string or Path objects defining location of JSON dependency structure file
+
+        Raises:
+            FileNotFoundError: if file defined 'file_path' does not exist
+        Returns:
+            dependency_tree: a list of structurally constructed Package objects
+        """
+        def resolve_dependency(pkg: str, depth:int=0) -> Package:
+            """Recursive function utilized for building the 'dependency_tree' object 
+            Recursion end once package has no dependecies.
+
+            Args:
+                pkg (str): name of a package in 'dependency_data'
+                depth (int, optional): Defines depth of recursion, which is later utilized for print formatting. Defaults to 0.
+
+            Returns:
+                Package: returns a Package with its dependencies and depth of recursion
+            """
+            package = Package(pkg, depth_level=depth)
             
             if len(dependency_data[pkg]) != 0:
                 for dependency in dependency_data[pkg]:
-                    # print(f"gooing deeper with recursion: from {pkg=} looking for deps of {dependency}")
                     package.dependencies.append(resolve_dependency(dependency, depth+1))
-            # print(f"returning  of {pkg}: {package}")
             return package
 		
 		# check for existence of a file, shortcircuit for errors
@@ -131,19 +180,24 @@ class DependencyResolver:
             raise FileNotFoundError(f"Error. File at the path {file_path} does not exist.")
 
         
+        # opens a file with context manager to prevent resource leaking
         with open(file_path) as json_file:
             dependency_data: dict = load(json_file)
    
         try:
+            # checking for validity of data loaded
             self.verify_dependency_structure(dependency_data)
+        except TypeError:    
+            print("Aborting program due to data structure issues.")
+            raise
         except (MissingPackageError, CyclicImportError):
-            print("Aborting program due to data structure issues")
+            print("Aborting program due to dependency structure issues.")
             raise
         else:
             dependency_graph = []
+            # cycle over root packages, building their respective package dependency structures ('dependency_tree')
             for pkg in dependency_data.keys():
                 dependency_graph.append(resolve_dependency(pkg))
-                
             return dependency_graph
 
     def print_dependency_graph(self, file_path: Union[str, Path]) -> None:
