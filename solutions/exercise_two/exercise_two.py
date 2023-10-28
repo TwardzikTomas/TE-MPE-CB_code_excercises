@@ -81,8 +81,11 @@ class Package:
         for dep in self.dependencies:
             dep.structural_print()
 
+# custom type hints definition
+dependency_tree = list[Package]
+
+
 class DependencyResolver:  
-      
     def verify_dependency_structure(self, dependency_data: dict[str, list]) -> None:
         self.verify_dependency_fields(dependency_data)     
         self.verify_presence(dependency_data)
