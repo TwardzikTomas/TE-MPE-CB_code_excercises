@@ -23,4 +23,6 @@ classifiers = [
 ]
 
 [project.scripts]
-excercise-one = "solutions.ecercise_one:detect_duplicate"
+detect-duplicate = "entry_points:detect_duplicate"
+exercise-two = "exercise_two:show_dependency_graph"
+show-dependency = "entry_points:dependency_graph"
