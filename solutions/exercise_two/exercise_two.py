@@ -75,6 +75,13 @@ class Package:
         class_name = type(self).__name__
         return f"{class_name}(name={self.name!r}, dependencies={[dependency.name for dependency in self.dependencies]}, depth_level={self.depth_level!r})"
 
+    def __eq__(self, other: 'Package'):
+        try:
+            ret = True if (self.name == other.name) and (self.dependencies == other.dependencies) and (self.depth_level == other.depth_level) else False
+        except AttributeError:
+            return False
+        return ret
+
     def structural_print(self):
         """
         Convenience method that recursively prints dependency structure of a package
