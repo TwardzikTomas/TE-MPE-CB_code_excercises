@@ -42,7 +42,7 @@ assumptions:
 # system imports
 import os
 from json import load, JSONDecodeError
-from typing import Union
+from typing import Union, Any
 from pathlib import Path
 
 
@@ -76,7 +76,7 @@ class Package:
         class_name = type(self).__name__
         return f"{class_name}(name={self.name!r}, dependencies={[dependency.name for dependency in self.dependencies]}, depth_level={self.depth_level!r})"
 
-    def __eq__(self, other: 'Package'):
+    def __eq__(self, other: Any) -> bool:
         try:
             ret = True if (self.name == other.name) and (self.dependencies == other.dependencies) and (self.depth_level == other.depth_level) else False
         except AttributeError:
