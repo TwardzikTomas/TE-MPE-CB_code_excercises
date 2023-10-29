@@ -49,3 +49,85 @@ def test_package_repr(log_stdout):
     assert log_stdout["stdout"] == "Package(name='pkg', dependencies=[], depth_level=2)\n"
 
 
+def test_file_presence():
+    with pytest.raises(FileNotFoundError):
+        dr = DependencyResolver()
+        assert dr.resolve_graph(add_test_path("non_existent_path.json"))
+
+
+def test_invalid_json_load():
+    with pytest.raises(json.JSONDecodeError):
+        dr = DependencyResolver()
+        assert dr.resolve_graph(add_test_path("invalid_json.json"))
+
+
+def test_json_structure():
+    with pytest.raises(TypeError):
+        dr = DependencyResolver()
+        assert dr.resolve_graph(add_test_path("list_json.json"))
+
+
+def test_dependency_structure():
+    with pytest.raises(TypeError):
+        dr = DependencyResolver()
+        assert dr.resolve_graph(add_test_path("invalid_dependencies.json"))
+
+
+def test_dependency_presence():
+    with pytest.raises(MissingPackageError):
+        dr = DependencyResolver()
+        assert dr.resolve_graph(add_test_path("missing_package.json"))
+
+
+@pytest.mark.parametrize('file_name',
+                         [('cyclic_import.json'),
+                          ('self_import.json'),])
+def test_cyclic_import(file_name):
+    with pytest.raises(CyclicImportError):
+        dr = DependencyResolver()
+        assert dr.resolve_graph(add_test_path(file_name))
+
+
+def test_empty_dependencies():
+    dr = DependencyResolver()
+    assert dr.resolve_graph(add_test_path("empty_dependencies.json")) == []
+
+
+def test_simple_package():
+    dr = DependencyResolver()
+    assert dr.resolve_graph(add_test_path("simple_dependencies.json")) == [Package("pkg1")]
+
+
+def test_example(example_structure):
+    dr = DependencyResolver()
+    assert dr.resolve_graph(add_test_path("deps.json")) == example_structure
+
+
+def test_build_dependency_graph(example_structure):
+    assert build_dependency_graph(add_test_path("deps.json")) == example_structure
+
+
+def test_structured_print(log_stdout):
+    dr = DependencyResolver()
+    dr.print_dependency_graph(add_test_path("deps.json"))
+
+    comp_string = "- pkg1\n"       \
+                  "  - pkg2\n"    \
+                  "    - pkg3\n" \
+                  "  - pkg3\n"    \
+                  "- pkg2\n"       \
+                  "  - pkg3\n"    \
+                  "- pkg3\n"
+    assert log_stdout["stdout"] == comp_string
+
+
+def test_show_dependency_graph(log_stdout):
+    show_dependency_graph(add_test_path("deps.json"))
+    comp_string = "- pkg1\n"       \
+                  "  - pkg2\n"    \
+                  "    - pkg3\n" \
+                  "  - pkg3\n"    \
+                  "- pkg2\n"       \
+                  "  - pkg3\n"    \
+                  "- pkg3\n"
+    assert log_stdout["stdout"] == comp_string
