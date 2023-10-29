@@ -98,9 +98,12 @@ def test_simple_package():
     assert dr.resolve_graph(add_test_path("simple_dependencies.json")) == [Package("pkg1")]
 
 
-def test_example(example_structure):
+@pytest.mark.parametrize('file_name',
+                         [('deps.json'),
+                          ('deps.txt')])
+def test_example(example_structure, file_name):
     dr = DependencyResolver()
-    assert dr.resolve_graph(add_test_path("deps.json")) == example_structure
+    assert dr.resolve_graph(add_test_path(file_name)) == example_structure
 
 
 def test_build_dependency_graph(example_structure):
