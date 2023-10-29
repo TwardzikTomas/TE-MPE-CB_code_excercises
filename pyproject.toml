@@ -2,27 +2,17 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["solutions"]
 
-[project]
-name = "TE_MPE_CB_code_interview"
-version = "0.0.1"
-authors = [
-    {name = "Twardzik Tomas", email = "twardziktom@gmail.com"}
-]
-description = "An example solution to CERN's CB section code interview."
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "click",
-    'importlib-metadata; python_version<"3.8"',
-]
-classifiers = [
-    "Programming Language :: Python :: 3",
-]
-
-[project.scripts]
-detect-duplicate = "entry_points:detect_duplicate"
-exercise-two = "exercise_two:show_dependency_graph"
-show-dependency = "entry_points:dependency_graph"
+[tool.mypy]
+mypy_path = "solutions"
+check_untyped_defs = true
+disallow_any_generics = false
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
