@@ -182,8 +182,10 @@ class DependencyResolver:
             """
             package = Package(pkg, depth_level=depth)
 
+            # recursion termination condition
             if len(dependency_data[pkg]) != 0:
                 for dependency in dependency_data[pkg]:
+                    # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
                     package.dependencies.append(resolve_dependency(dependency, depth+1))
             return package
 
@@ -226,15 +228,31 @@ class DependencyResolver:
             node.structural_print()
 
 
-# convenience method exposing variable target path
+# convenience methods
 def show_dependency_graph(target_path: str = TARGET_PATH):
+    """
+    Convenience method for invoking dependency graph plot.
+    Provides required default path to dependency json at '/tmp/deps.json'.
+
+    Args:
+        target_path (str, optional): an absolute path to dependency file in json format. Defaults to TARGET_PATH.
+    """
     dr = DependencyResolver()
     # print dependency graph
     dr.print_dependency_graph(target_path)
 
 
-# convenience method exposing variable target path
 def build_dependency_graph(target_path: str = TARGET_PATH) -> dependency_tree:
+    """
+    Convenience method for constructing and retrieving 'dependency_tree'.
+    Provides required default path to dependency json at '/tmp/deps.json'.
+
+    Args:
+        target_path (str, optional): an absolute path to dependency file in json format. Defaults to TARGET_PATH.
+
+    Returns:
+        dependency_tree: a list of structurally constructed Package objects
+    """
     dr = DependencyResolver()
     # return retrieved 'dependency_tree'
     return dr.resolve_graph(target_path)
