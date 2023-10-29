@@ -62,3 +62,9 @@ if __name__ == "__main__":
 
     list3 = ["a", 0, 0., "a", True, [], (), ["a"], None, (1,), 1]
     assert detect_duplicate_elements(list3) == ["a", 0, 1]
+
+    list4 = [('a',), 'a']
+    assert detect_duplicate_elements(list4) == []
+
+    list5 = [[1, 2, 3], 1, 2, 3, [1, 2], [1, 2, 3]]
+    assert detect_duplicate_elements(list5) == [[1, 2, 3]]
