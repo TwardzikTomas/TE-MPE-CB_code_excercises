@@ -40,7 +40,7 @@ assumptions:
 
 # system imports
 import os
-from json import load
+from json import load, JSONDecodeError
 from typing import Union
 from pathlib import Path
 
@@ -192,8 +192,11 @@ class DependencyResolver:
 
         # opens a file with context manager to prevent resource leaking
         with open(file_path) as json_file:
-            dependency_data: dict = load(json_file)
-
+            try:
+                dependency_data: dict = load(json_file)
+            except JSONDecodeError:
+                print(f"File {file_path} does not hold valid JSON format. Exiting program")
+                raise
         try:
             # checking for validity of data loaded
             self.verify_dependency_structure(dependency_data)
