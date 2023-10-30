@@ -69,29 +69,28 @@ class MissingPackageError(Exception):
 class Package:
     """Class that represents a package, with its dependencies and depth in the dependency graph
     """
-    def __init__(self, name: str, depth_level: int = 0):
+    def __init__(self, name: str):
         self.name = name
         self.dependencies: list['Package'] = []
-        self.depth_level = depth_level
 
     def __repr__(self):
         class_name = type(self).__name__
-        return f"{class_name}(name={self.name!r}, dependencies={[dependency.name for dependency in self.dependencies]}, depth_level={self.depth_level!r})"
+        return f"{class_name}(name={self.name!r}, dependencies={[dependency.name for dependency in self.dependencies]})"
 
     def __eq__(self, other: Any) -> bool:
         try:
-            ret = True if (self.name == other.name) and (self.dependencies == other.dependencies) and (self.depth_level == other.depth_level) else False
+            ret = True if (self.name == other.name) and (self.dependencies == other.dependencies) else False
         except AttributeError:
             return False
         return ret
 
-    def structural_print(self):
+    def structural_print(self, depth_level: int = 0):
         """
         Convenience method that recursively prints dependency structure of a package
         """
-        print(f"{self.depth_level*'  '}- {self.name}")
+        print(f"{depth_level*'  '}- {self.name}")
         for dep in self.dependencies:
-            dep.structural_print()
+            dep.structural_print(depth_level+1)
 
 
 # custom type hints definition
@@ -171,24 +170,23 @@ class DependencyResolver:
         Returns:
             dependency_tree: a list of structurally constructed Package objects
         """
-        def resolve_dependency(pkg: str, depth: int = 0) -> Package:
+        def resolve_dependency(pkg: str) -> Package:
             """Recursive function utilized for building the 'dependency_tree' object
             Recursion end once package has no dependencies.
 
             Args:
                 pkg (str): name of a package in 'dependency_data'
-                depth (int, optional): Defines depth of recursion, which is later utilized for print formatting. Defaults to 0.
 
             Returns:
                 Package: returns a Package with its dependencies and depth of recursion
             """
-            package = Package(pkg, depth_level=depth)
+            package = Package(pkg)
 
             # recursion termination condition
             if len(dependency_data[pkg]) != 0:
                 for dependency in dependency_data[pkg]:
                     # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
-                    package.dependencies.append(resolve_dependency(dependency, depth+1))
+                    package.dependencies.append(resolve_dependency(dependency))
             return package
 
         # check for existence of a file, shortcircuit for errors

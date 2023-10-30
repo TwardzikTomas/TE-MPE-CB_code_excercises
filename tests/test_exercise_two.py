@@ -17,36 +17,37 @@ def add_test_path(file_name: str):
 
 def test_package_eq():
     package_name = 'pkg'
-    depth = 2
-    p1 = Package(package_name, depth_level=depth)
-    p2 = Package(package_name, depth_level=depth)
+    p1 = Package(package_name)
+    p2 = Package(package_name)
+    p3 = Package('dep')
+    p1.dependencies = p3
+    p2.dependencies = p3
     assert p1 == p2
 
 
-@pytest.mark.parametrize('test_name, test_dependency_flag,test_depth',
-                         [('pkg2', True, 0),
-                          ('pkg', True, 1),
-                          ('pkg', False, 2),
+@pytest.mark.parametrize('test_name, test_dependency_flag',
+                         [('pkg2', True),
+                          ('pkg', False),
                           ])
-def test_package_noteq(test_name, test_dependency_flag, test_depth):
-    dep_p = Package('dep_pkg', depth_level=3)
-    p1 = Package('pkg', depth_level=2)
+def test_package_noteq(test_name, test_dependency_flag):
+    dep_p = Package('dep_pkg')
+    p1 = Package('pkg')
     p1.dependencies = [dep_p]
-    p2 = Package(test_name, test_depth)
+    p2 = Package(test_name)
     if test_dependency_flag is True:
         p2.dependencies = [dep_p]
     assert p1 != p2
 
 
 def test_package_eq_type_mismatch():
-    p1 = Package('pkg', depth_level=2)
+    p1 = Package('pkg')
     assert p1 != 'package'
 
 
 def test_package_repr(log_stdout):
-    p1 = Package('pkg', depth_level=2)
+    p1 = Package('pkg')
     print(p1)
-    assert log_stdout["stdout"] == "Package(name='pkg', dependencies=[], depth_level=2)\n"
+    assert log_stdout["stdout"] == "Package(name='pkg', dependencies=[])\n"
 
 
 def test_file_presence():

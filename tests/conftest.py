@@ -24,10 +24,10 @@ def log_stdout(monkeypatch):
 @pytest.fixture
 def example_structure():
     p1 = Package("pkg1")
-    p1.dependencies = [Package("pkg2", depth_level=1), Package("pkg3", depth_level=1)]
-    p1.dependencies[0].dependencies = [Package("pkg3", depth_level=2)]
+    p1.dependencies = [Package("pkg2"), Package("pkg3")]
+    p1.dependencies[0].dependencies = [Package("pkg3")]
     p2 = Package("pkg2")
-    p2.dependencies = [Package('pkg3', depth_level=1)]
+    p2.dependencies = [Package('pkg3')]
     p3 = Package("pkg3")
     package_structure = [p1, p2, p3]
     return package_structure
