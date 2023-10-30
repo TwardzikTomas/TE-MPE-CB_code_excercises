@@ -25,6 +25,8 @@ or in editable mode with:
 pip install -r requirements.txt -e .
 ```
 
+>Editable mode enables ```click``` based entrypoints (commands `detect-duplicates` and `show-dependency`).
+
 ## Entry points
 For convenience, user can access some code functionality directly from the command line interface.
 
