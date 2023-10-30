@@ -33,12 +33,12 @@ In addition, setup a CI pipeline (using Gitlab CI, Github Actions or equivalent)
 the best possible automation for the quality of your code.
 
 
-assumptions:
-    - valid format of the dependency json file is as given
-    - any deviation from the format is prohibited
-    - cyclic imports result in failure
-    - all packages in dependencies must be listed themselves in the root of the structure
-    - other file extensions are allowed, if JSON decoder can extract valid JSON out of them ('.txt')
+Assumptions taken:
+    - valid format of the dependency json file is as given,
+    - any deviation from the format is prohibited,
+    - cyclic dependencies result in failure,
+    - all packages in dependencies must be listed themselves in the root of the structure,
+    - other file extensions are allowed, if JSON decoder can extract valid JSON out of them ('.txt').
 """
 
 # system imports
