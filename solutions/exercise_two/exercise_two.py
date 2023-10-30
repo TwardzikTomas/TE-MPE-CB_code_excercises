@@ -182,11 +182,9 @@ class DependencyResolver:
             """
             package = Package(pkg)
 
-            # recursion termination condition
-            if len(dependency_data[pkg]) != 0:
-                for dependency in dependency_data[pkg]:
-                    # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
-                    package.dependencies.append(resolve_dependency(dependency))
+            for dependency in dependency_data[pkg]:
+                # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
+                package.dependencies.append(resolve_dependency(dependency))
             return package
 
         # check for existence of a file, shortcircuit for errors
