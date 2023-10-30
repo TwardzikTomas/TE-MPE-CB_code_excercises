@@ -171,7 +171,7 @@ class DependencyResolver:
             dependency_tree: a list of structurally constructed Package objects
         """
         def resolve_dependency(pkg: str) -> Package:
-            """Recursive function utilized for building the 'dependency_tree' object
+            """Recursive function utilized for building the 'dependency_tree' object.
             Recursion end once package has no dependencies.
 
             Args:
