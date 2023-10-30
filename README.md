@@ -98,7 +98,7 @@ The unit test suite can be executed with:
 pytest
 ```
 
-At this moment, test suite consists of 20 tests, all of which are passing.
+At this moment, test suite consists of 19 tests, all of which are passing.
 
 **PyTest** is configured under **pyproject.toml** file, and runs only one package ***exercise_two*** and produces a PyTest coverage report with missing lines listed.
 
