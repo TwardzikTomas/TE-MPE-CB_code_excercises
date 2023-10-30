@@ -178,7 +178,7 @@ class DependencyResolver:
                 pkg (str): name of a package in 'dependency_data'
 
             Returns:
-                Package: returns a Package with its dependencies and depth of recursion
+                Package: returns a Package with its dependencies
             """
             package = Package(pkg)
 
