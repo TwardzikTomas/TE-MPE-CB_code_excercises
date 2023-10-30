@@ -1,4 +1,6 @@
 """
+This file is a proposed solution to a task number two from TE-MPE-CB - coding exercise two.
+
 Write a small program, which:
 
  Reads a JSON file from a fixed filesystem location, e.g. /tmp/deps.json, containing a list of packages and their dependencies.
