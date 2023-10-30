@@ -25,7 +25,7 @@ or in editable mode with:
 pip install -r requirements.txt -e .
 ```
 
->Editable mode enables ```click``` based entrypoints (commands `detect-duplicates` and `show-dependency`).
+>Editable mode enables ```click``` based entrypoints (commands `detect-duplicates` and `show-dependency`). If you want to use these two commands, you are obligated to install in editable mode.
 
 ## Entry points
 For convenience, user can access some code functionality directly from the command line interface.
@@ -85,7 +85,7 @@ Configuration of the **MyPy** is located in **pyproject.toml**. As one can notic
 To execute Python linter **Flake8** on ```solutions``` run:
 
 ```
-flake8 solution
+flake8 solutions
 ```
 
 **Flake8** is configured in **setup.cfg**. This project is configured to 'max-line-length' of 160 characters.
