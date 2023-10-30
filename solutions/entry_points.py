@@ -20,6 +20,8 @@ def dependency_graph(file_path):
 @click.command()
 @click.argument('elements', nargs=-1)
 def detect_duplicate(elements):
-    """Detects duplicate entries in ELEMENTS argument.
+    """
+    Detects duplicate entries in ELEMENTS argument.
+    ELEMENTS take unlimited amount of arguments.
     """
     print(detect_duplicate_elements(elements))
