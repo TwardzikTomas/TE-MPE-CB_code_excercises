@@ -3,7 +3,7 @@ This file is a proposed solution to a task number two from TE-MPE-CB - coding ex
 
 Write a small program, which:
 
- Reads a JSON file from a fixed filesystem location, e.g. /tmp/deps.json, containing a list of packages and their dependencies.
+ 1. Reads a JSON file from a fixed filesystem location, e.g. /tmp/deps.json, containing a list of packages and their dependencies.
  In this JSON file, a key represents a package name, and the value is a list of dependencies (package names) for that key:
 
 '{
@@ -12,7 +12,7 @@ Write a small program, which:
   "pkg3": []
 }'
 
-Traverses the dependencies loaded from the JSON file and reconstructs the full dependency graph.
+2. Traverses the dependencies loaded from the JSON file and reconstructs the full dependency graph.
 For the input above, the full graph would be the following:
 
 - pkg1
@@ -23,10 +23,10 @@ For the input above, the full graph would be the following:
   - pkg3
 - pkg3
 
-Has a function that takes a filename as an input and returns an object representing the fully resolved graph.
+3. Has a function that takes a filename as an input and returns an object representing the fully resolved graph.
 Please provide a test case that validates this function. Use any testing framework of your choice.
 
-Is a valid Python package or module and is runnable with python -m program_name command.
+4. Is a valid Python package or module and is runnable with `python -m program_name command`.
 Running this command should print the graph to stdout. The format in which it prints is not important.
 
 In addition, setup a CI pipeline (using Gitlab CI, Github Actions or equivalent)to ensure
