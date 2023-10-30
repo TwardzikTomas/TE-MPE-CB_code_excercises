@@ -3,7 +3,7 @@ from os.path import dirname, abspath, join
 import json
 
 # local imports
-from exercise_two.exercise_two import (CyclicImportError, MissingPackageError, Package, DependencyResolver,
+from exercise_two.exercise_two import (CyclicDependencyError, MissingPackageError, Package, DependencyResolver,
                                        show_dependency_graph, build_dependency_graph)
 
 # third-party imports
@@ -83,7 +83,7 @@ def test_dependency_presence():
                          [('cyclic_import.json'),
                           ('self_import.json'),])
 def test_cyclic_import(file_name):
-    with pytest.raises(CyclicImportError):
+    with pytest.raises(CyclicDependencyError):
         dr = DependencyResolver()
         assert dr.resolve_graph(add_test_path(file_name))
 

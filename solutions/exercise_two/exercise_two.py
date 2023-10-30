@@ -52,9 +52,9 @@ from pathlib import Path
 TARGET_PATH = "/tmp/deps.json"
 
 
-class CyclicImportError(Exception):
+class CyclicDependencyError(Exception):
     """
-    Raised if cyclic dependency is detected during verification of the dependency file file
+    Raised if cyclic dependency is detected during verification of the dependency file
     """
     ...
 
@@ -158,7 +158,7 @@ class DependencyResolver:
         for pkg, deps in dependency_data.items():
             for dep in deps:
                 if pkg in dependency_data[dep]:
-                    raise CyclicImportError(f"ERROR: packages {pkg!r} and {dep!r} are creating cyclic dependency")
+                    raise CyclicDependencyError(f"ERROR: packages {pkg!r} and {dep!r} are creating cyclic dependency")
 
     def resolve_graph(self, file_path: Union[str, Path]) -> dependency_tree:
         """A method retrieving 'dependency_tree' structure from a file defined by 'file_path' argument.
@@ -208,7 +208,7 @@ class DependencyResolver:
         except TypeError:
             print("Aborting program due to data structure issues.")
             raise
-        except (MissingPackageError, CyclicImportError):
+        except (MissingPackageError, CyclicDependencyError):
             print("Aborting program due to dependency structure issues.")
             raise
         else:
