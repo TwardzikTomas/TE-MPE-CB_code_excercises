@@ -1,5 +1,5 @@
 """
-This file is a proposed solution to a task number one form TE-MPE-CB - coding exercise one.
+This file is a proposed solution to a task number one from TE-MPE-CB - coding exercise one.
 
 The task is:
 Write a function that detects all duplicate elements in a list: given a list of objects,
@@ -28,18 +28,17 @@ def detect_duplicate_elements(elements: list) -> list:
         elements (list): list of objects with possible duplicates
 
     Returns:
-        list: list of duplicate objects in the 'elements' list ordered in FIFO.
-            If there are no duplicates, returns an empty list.
+        list: list of duplicate objects in the `elements` list ordered in FIFO.
+              If there are no duplicates, returns an empty list.
 
     """
 
-    # define duplicate lis and unique set
     duplicate_list = []                          # define duplicate list to hold duplicate objects
     ordered_unique_list = []                     # define ordered list of unique objects
 
     for element in elements:
         if element not in ordered_unique_list:
-            # adding unique elements while respecting their ordering (normal set() in python does not maintain ordering)
+            # adding unique elements while respecting their ordering
             ordered_unique_list.append(element)
         else:
             if element not in duplicate_list:
