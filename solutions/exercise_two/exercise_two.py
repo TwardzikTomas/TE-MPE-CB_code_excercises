@@ -118,15 +118,15 @@ class DependencyResolver:
             dependency_data (dict[str, list]): Data containing dependency relations read from a JSON file.
 
         Raises:
-            TypeError: raises if argument 'dependency_data' is not dict,
-            TypeError: raises if keys of the dict are not strings
-            TypeError: raises if values of the dict are not lists
+            TypeError: raises if argument 'dependency_data' is not a dict,
+            TypeError: raises if keys of the dict are not strings,
+            TypeError: raises if values of the dict are not lists.
         """
         if not isinstance(dependency_data, dict):
-            raise TypeError("Loaded JSON file does not provide dictionary")
+            raise TypeError("Loaded JSON file does not provide a dictionary")
         for pkg, deps in dependency_data.items():
             if not isinstance(pkg, str):
-                raise TypeError(f"ERROR: Package name {pkg!r} is not string")
+                raise TypeError(f"ERROR: Package name {pkg!r} is not a string")
             if not isinstance(deps, list):
                 raise TypeError(f"ERROR: Package {pkg!r} dependencies are not a list")
 
