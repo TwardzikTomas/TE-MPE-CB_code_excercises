@@ -11,7 +11,8 @@ For example, for the input ["b", "a", "c", "c", "e", "a", "c", "d", "c", "d"], t
 Assumptions taken:
     - since the function is type hinted, one can assume the function will be indeed given a list, and no runtime typechecking will be done,
     - since it was not specified, we cannot assume list will contain objects of uniform data type,
-    - we also assume that objects given may not be hashable, which prohibits use of more efficient built-in types such as sets for the solution
+    - we also assume that objects given may not be hashable, which prohibits use of more efficient
+      built-in types such as sets for the solution,
     - some types have direct typecasting strategy that suggest equivalence of content, while the type itself is different,
       this function will uphold this automatic pythonic typecasting strategy (e.g. `1. == 1` , `1 == True` etc.).
 """
