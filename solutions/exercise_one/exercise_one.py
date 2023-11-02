@@ -15,6 +15,11 @@ Assumptions taken:
       built-in types such as sets for the solution,
     - some types have direct typecasting strategy that suggest equivalence of content, while the type itself is different,
       this function will uphold this automatic pythonic typecasting strategy (e.g. `1. == 1` , `1 == True` etc.).
+
+Improvement ideas:
+    - if we are given hashable objects, we could immediately go to dicts and reduce complexity to O(n) if optimistic, O(n2) if pessimistic
+    - one could make checking stricter (with performance consequences) to prevent, situations like in list3 example, where gets
+      duplicates detected, due to typecasting
 """
 
 

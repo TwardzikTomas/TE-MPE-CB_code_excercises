@@ -39,6 +39,10 @@ Assumptions taken:
     - cyclic dependencies result in failure,
     - all packages in dependencies must be listed themselves in the root of the structure,
     - other file extensions are allowed, if JSON decoder can extract valid JSON out of them ('.txt').
+
+Possible improvements:
+    -current recursive scheme is inefficient, one builds package chains repeatedly,
+     while it would be much more interesting to "cache" the results on recursion method return
 """
 
 # system imports
