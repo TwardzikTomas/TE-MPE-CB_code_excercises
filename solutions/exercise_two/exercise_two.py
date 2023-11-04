@@ -98,7 +98,7 @@ class Package:
 
 
 # custom type hints definition
-dependency_tree = list[Package]
+dependency_tree = dict[str, Package]
 
 
 class DependencyResolver:
@@ -113,7 +113,6 @@ class DependencyResolver:
         """
         self.verify_dependency_fields(dependency_data)
         self.verify_presence(dependency_data)
-        self.verify_cyclic_imports(dependency_data)
 
     def verify_dependency_fields(self, dependency_data: dict[str, list]) -> None:
         """Function verifying if the data structure provided by JSON file is valid.
@@ -149,20 +148,6 @@ class DependencyResolver:
                 if dep not in pkgs:
                     raise MissingPackageError(f"ERROR: Package {dep!r} was not found in dependency list")
 
-    def verify_cyclic_imports(self, dependency_data: dict[str, list]) -> None:
-        """Function verifying if there is no cyclic redundancy present.
-
-        Args:
-            dependency_data (dict[str, list]): Data containing dependency relations read from a JSON file.
-
-        Raises:
-            CyclicImportError: raise if a package has a dependency, for which it is a dependency itself
-        """
-        for pkg, deps in dependency_data.items():
-            for dep in deps:
-                if pkg in dependency_data[dep]:
-                    raise CyclicDependencyError(f"ERROR: packages {pkg!r} and {dep!r} are creating cyclic dependency")
-
     def resolve_graph(self, file_path: Union[str, Path]) -> dependency_tree:
         """A method retrieving 'dependency_tree' structure from a file defined by 'file_path' argument.
 
@@ -174,7 +159,7 @@ class DependencyResolver:
         Returns:
             dependency_tree: a list of structurally constructed Package objects
         """
-        def resolve_dependency(pkg: str) -> Package:
+        def resolve_dependency(pkg: str, recursion_depth: int) -> Package:
             """Recursive function utilized for building the 'dependency_tree' object.
             Recursion end once package has no dependencies.
 
@@ -184,11 +169,24 @@ class DependencyResolver:
             Returns:
                 Package: returns a Package with its dependencies
             """
+            if recursion_depth >= max_recursion_depth:
+                raise CyclicDependencyError(f"Depth of recursion reached its limit {max_recursion_depth!r}")
+
             package = Package(pkg)
 
             for dependency in dependency_data[pkg]:
-                # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
-                package.dependencies.append(resolve_dependency(dependency))
+                # looking up resolved packages
+                dependency_resolved = dependency_graph.get(dependency, None)
+                if dependency_resolved is None:
+                    # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
+                    dependency_resolved = resolve_dependency(dependency, recursion_depth+1)
+                else:
+                    print(f"Already resolved dep: {dependency}")
+                package.dependencies.append(dependency_resolved)
+            # caching resolved package
+            if dependency_graph.get(pkg, None) is None:
+                dependency_graph[pkg] = package
+                print(f"Caching resolved: {pkg}")
             return package
 
         # check for existence of a file, shortcircuit for errors
@@ -212,10 +210,12 @@ class DependencyResolver:
             print("Aborting program due to dependency structure issues.")
             raise
         else:
-            dependency_graph = []
-            # cycle over root packages, building their respective package dependency structures ('dependency_tree')
+            max_recursion_depth = len(dependency_data)
+            dependency_graph: dict[str, Package] = {}
             for pkg in dependency_data.keys():
-                dependency_graph.append(resolve_dependency(pkg))
+                if dependency_graph.get(pkg, None) is None:
+                    dependency_graph[pkg] = resolve_dependency(pkg, 0)
+
             return dependency_graph
 
     def print_dependency_graph(self, file_path: Union[str, Path]) -> None:
@@ -226,8 +226,8 @@ class DependencyResolver:
         """
         resolved_graph = self.resolve_graph(file_path)
 
-        for node in resolved_graph:
-            node.structural_print()
+        for node in resolved_graph.keys():
+            resolved_graph[node].structural_print()
 
 
 # convenience methods
@@ -262,4 +262,9 @@ def build_dependency_graph(target_path: str = TARGET_PATH) -> dependency_tree:
 
 # example uses
 if __name__ == "__main__":
+
+    dr = DependencyResolver()
+    graph = dr.resolve_graph(TARGET_PATH)
+    print(graph)
+
     show_dependency_graph()
