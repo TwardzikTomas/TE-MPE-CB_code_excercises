@@ -39,6 +39,7 @@ Assumptions taken:
     - cyclic dependencies result in failure,
     - all packages in dependencies must be listed themselves in the root of the structure,
     - other file extensions are allowed, if JSON decoder can extract valid JSON out of them ('.txt').
+    - order of listed packages does not influence the validity of a solution
 
 Possible improvements:
     -current recursive scheme is inefficient, one builds package chains repeatedly,
@@ -177,16 +178,15 @@ class DependencyResolver:
             for dependency in dependency_data[pkg]:
                 # looking up resolved packages
                 dependency_resolved = dependency_graph.get(dependency, None)
+
                 if dependency_resolved is None:
                     # stepping deeper with recursion, adding Packages in dependencies with one bigger depth
                     dependency_resolved = resolve_dependency(dependency, recursion_depth+1)
-                else:
-                    print(f"Already resolved dep: {dependency}")
+
                 package.dependencies.append(dependency_resolved)
             # caching resolved package
             if dependency_graph.get(pkg, None) is None:
                 dependency_graph[pkg] = package
-                print(f"Caching resolved: {pkg}")
             return package
 
         # check for existence of a file, shortcircuit for errors
