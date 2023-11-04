@@ -29,5 +29,7 @@ def example_structure():
     p2 = Package("pkg2")
     p2.dependencies = [Package('pkg3')]
     p3 = Package("pkg3")
-    package_structure = [p1, p2, p3]
+    package_structure = dict(pkg1=p1,
+                             pkg2=p2,
+                             pkg3=p3)
     return package_structure
